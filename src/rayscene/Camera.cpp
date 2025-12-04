@@ -49,9 +49,13 @@
 {
     const Vector3 origin(0, 0, -1);
 
+    // Au lieu de faire (segment->height / 2.0) 1080 fois,
+    // on le pré-calcule UNE SEULE FOIS.
+    const double halfHeight = segment->height * 0.5;
+
     for (int y = segment->rowMin; y < segment->rowMax; ++y)
     {
-        double yCoord = (segment->height / 2.0) - (y * segment->intervalY);
+        double yCoord = halfHeight - (y * segment->intervalY);
 
         for (int x = 0; x < segment->image->width; ++x)
         {
@@ -69,11 +73,12 @@
 }
 
 
+
 void Camera::render(Image &image, Scene &scene)
 {
     scene.prepare(); // Optimisation 1: préparer la scène avant le rendu
 
-    double ratio = (double)image.width / (double)image.height;
+    double ratio = static_cast<double>(image.width) / static_cast<double>(image.height);
     double height = 1.0 / ratio;
     double intervalX = 1.0 / (double)image.width;
     double intervalY = height / (double)image.height;
