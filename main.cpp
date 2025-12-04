@@ -36,16 +36,6 @@ int main(int argc, char *argv[])
   std::cout << "Done." << std::endl;
   std::printf("Total time: %.3f seconds.\n", elapsed.count() * 1e-9);
 
-  //exo 1
-  // Ajout métriques
-  std::cout << "[Metrics] Resolution: "
-          << image->width << "x" << image->height << std::endl;
-
-  std::cout << "[Metrics] RenderTimeSeconds: "
-          << elapsed.count() * 1e-9 << std::endl;
-// Fin Ajout métriques
-
-
   std::cout << "Writing file: " << outpath << std::endl;
   image->writeFile(outpath);
 

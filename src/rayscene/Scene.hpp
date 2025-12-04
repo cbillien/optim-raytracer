@@ -23,7 +23,7 @@ public:
   std::vector<Light *> getLights();
 
   void prepare();
-  Color raycast(const Ray &r, const Ray &cameraRay, int castCount, int maxReflections);
+  Color raycast(Ray &r, Ray &camera, int castCount, int maxCastCount);
 
   bool closestIntersection(Ray &r, Intersection &closest, CullingType culling);
 };
