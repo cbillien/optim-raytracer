@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "../raymath/Vector3.hpp"
+#include <thread>
 #include "../rayimage/Image.hpp"
 #include "../rayscene/Scene.hpp"
 
@@ -20,7 +21,7 @@ public:
   Vector3 getPosition();
   void setPosition(Vector3 &pos);
 
-  void render(Image &image, Scene &scene);
+  void render(Image &image, Scene &scene); // Optimisation 4: suppression du new/delete inutile
 
   friend std::ostream &operator<<(std::ostream &_stream, Vector3 const &vec);
 };

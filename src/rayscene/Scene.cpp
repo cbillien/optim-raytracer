@@ -1,97 +1,91 @@
 #include <iostream>
 #include "Scene.hpp"
+#include <cmath> 
 #include "Intersection.hpp"
 
-Scene::Scene()
-{
-}
 
+Scene::Scene() {}
 Scene::~Scene()
 {
-  for (int i = 0; i < objects.size(); ++i)
-  {
-    delete objects[i];
-  }
-
-  for (int i = 0; i < lights.size(); ++i)
-  {
-    delete lights[i];
-  }
+    for (SceneObject* obj : objects) delete obj;
+    for (Light* light : lights) delete light;
 }
 
 void Scene::add(SceneObject *object)
 {
-  objects.push_back(object);
+    objects.push_back(object);
 }
 
 void Scene::addLight(Light *light)
 {
-  lights.push_back(light);
+    lights.push_back(light);
 }
 
 void Scene::prepare()
 {
-  for (int i = 0; i < objects.size(); ++i)
-  {
-    objects[i]->applyTransform();
-  }
+    for (SceneObject* obj : objects) obj->applyTransform();
 }
 
 std::vector<Light *> Scene::getLights()
 {
-  return lights;
+    return lights;
 }
+
 
 bool Scene::closestIntersection(Ray &r, Intersection &closest, CullingType culling)
 {
-  Intersection intersection;
+    Intersection intersection;
+    double closestDistance2 = -1;  // distance au carré
+    Intersection closestInter;
 
-  double closestDistance = -1;
-  Intersection closestInter;
-  for (int i = 0; i < objects.size(); ++i)
-  {
-    if (objects[i]->intersects(r, intersection, culling))
+    for (SceneObject* obj : objects)
     {
-
-      intersection.Distance = (intersection.Position - r.GetPosition()).length();
-      if (closestDistance < 0 || intersection.Distance < closestDistance)
-      {
-        closestDistance = intersection.Distance;
-        closestInter = intersection;
-      }
+        if (obj->intersects(r, intersection, culling))
+        {
+            // On calcule la distance au carré pour éviter le sqrt
+            double dist2 = (intersection.Position - r.GetPosition()).lengthSquared();
+            
+            if (closestDistance2 < 0 || dist2 < closestDistance2)
+            {
+                closestDistance2 = dist2;
+                closestInter = intersection;
+                closestInter.Distance = std::sqrt(dist2); // on garde Distance réelle si besoin
+            }
+        }
     }
-  }
-  closest = closestInter;
-  return (closestDistance > -1);
+
+    closest = closestInter;
+    return (closestDistance2 > -1);
 }
 
-Color Scene::raycast(Ray &r, Ray &camera, int castCount, int maxCastCount)
+
+Color Scene::raycast(const Ray &r, const Ray &camera, int castCount, int maxCastCount)
 {
+    Color pixel;
+    Intersection intersection;
 
-  Color pixel;
-
-  Intersection intersection;
-
-  if (closestIntersection(r, intersection, CULLING_FRONT))
-  {
-    // Add the view-ray for convenience (the direction is normalised in the constructor)
-    intersection.View = (camera.GetPosition() - intersection.Position).normalize();
-
-    if (intersection.Mat != NULL)
+    // On cherche l'intersection la plus proche
+    if (closestIntersection(const_cast<Ray&>(r), intersection, CULLING_FRONT))
     {
-      pixel = pixel + (intersection.Mat)->render(r, camera, &intersection, this);
+        // Calcul du vecteur de vue
+        intersection.View = (camera.GetPosition() - intersection.Position).normalize();
 
-      // Reflect
-      if (castCount < maxCastCount & intersection.Mat->cReflection > 0)
-      {
-        Vector3 reflectDir = r.GetDirection().reflect(intersection.Normal);
-        Vector3 origin = intersection.Position + (reflectDir * COMPARE_ERROR_CONSTANT);
-        Ray reflectRay(origin, reflectDir);
+        if (intersection.Mat != nullptr)
+        {
+            // Rendu du matériau
+            pixel = pixel + intersection.Mat->render(const_cast<Ray&>(r), const_cast<Ray&>(camera), &intersection, this);
 
-        pixel = pixel + raycast(reflectRay, camera, castCount + 1, maxCastCount) * intersection.Mat->cReflection;
-      }
+            // Réflexion si nécessaire
+            if (castCount < maxCastCount && intersection.Mat->cReflection > 0)
+            {
+                Vector3 reflectDir = r.GetDirection().reflect(intersection.Normal);
+                Vector3 origin = intersection.Position + (reflectDir * COMPARE_ERROR_CONSTANT);
+                Ray reflectRay(origin, reflectDir);
+
+                pixel = pixel + raycast(reflectRay, camera, castCount + 1, maxCastCount) * intersection.Mat->cReflection;
+            }
+        }
     }
-  }
 
-  return pixel;
+    return pixel;
 }
