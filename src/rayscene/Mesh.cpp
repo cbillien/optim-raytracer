@@ -71,23 +71,23 @@ bool Mesh::intersects(Ray &r, Intersection &intersection, CullingType culling)
 {
     Intersection tInter;
 
-    double closestDistance = -1;
+    double closestDistance2 = -1; // distance au carré pour éviter sqrt
     Intersection closestInter;
     for (int i = 0; i < triangles.size(); ++i)
     {
         if (triangles[i]->intersects(r, tInter, culling))
         {
-
-            tInter.Distance = (tInter.Position - r.GetPosition()).length();
-            if (closestDistance < 0 || tInter.Distance < closestDistance)
+            // On calcule la distance au carré pour éviter le sqrt
+            double dist2 = (tInter.Position - r.GetPosition()).lengthSquared();
+            if (closestDistance2 < 0 || dist2 < closestDistance2)
             {
-                closestDistance = tInter.Distance;
+                closestDistance2 = dist2;
                 closestInter = tInter;
             }
         }
     }
 
-    if (closestDistance < 0)
+    if (closestDistance2 < 0)
     {
         return false;
     }
