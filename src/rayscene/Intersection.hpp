@@ -11,13 +11,13 @@ class Intersection
 public:
   Vector3 Position;
   Vector3 Normal;
-  float Distance;
+  float Distance = 0;
   Ray SourceRay;
   Vector3 View;
-  Material *Mat;
+  Material* Mat = nullptr;
 
-  Intersection();
-  ~Intersection();
+  Intersection() = default;
+  ~Intersection() = default;
 
-  Intersection &operator=(Intersection const &inters);
+  Intersection& operator=(const Intersection& inter) = default;
 };
