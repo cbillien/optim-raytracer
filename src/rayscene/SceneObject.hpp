@@ -1,5 +1,6 @@
 #pragma once
 #include "../raymath/Ray.hpp"
+#include "../raymath/AABB.hpp"
 #include "Intersection.hpp"
 #include "Material.hpp"
 #include "../raymath/Transform.hpp"
@@ -18,6 +19,7 @@ public:
   std::string name = "";
   Material *material = NULL;
   Transform transform;
+  AABB boundingBox;  // Bounding box pour l'optimisation
 
   SceneObject();
   ~SceneObject();

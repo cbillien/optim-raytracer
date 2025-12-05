@@ -59,16 +59,37 @@ void Mesh::loadFromObj(std::string path)
 
 void Mesh::applyTransform()
 {
+    // Initialiser la bounding box avec des valeurs extrêmes
+    bool first = true;
+    
     for (int i = 0; i < triangles.size(); ++i)
     {
         triangles[i]->material = this->material;
         triangles[i]->transform = transform;
         triangles[i]->applyTransform();
+        
+        // Agrandir la bounding box du mesh pour inclure chaque triangle
+        if (first)
+        {
+            boundingBox = triangles[i]->boundingBox;
+            first = false;
+        }
+        else
+        {
+            boundingBox.subsume(triangles[i]->boundingBox);
+        }
     }
 }
 
 bool Mesh::intersects(Ray &r, Intersection &intersection, CullingType culling)
 {
+    // Early rejection : si le rayon ne touche pas la bounding box du mesh,
+    // on évite de tester les centaines de triangles !
+    if (!boundingBox.intersects(r))
+    {
+        return false;
+    }
+
     Intersection tInter;
 
     double closestDistance2 = -1; // distance au carré pour éviter sqrt

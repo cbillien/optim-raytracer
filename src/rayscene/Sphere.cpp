@@ -15,10 +15,20 @@ void Sphere::applyTransform()
 {
   Vector3 c;
   this->center = this->transform.apply(c);
+
+  // Calculer la bounding box de la sphère
+  Vector3 radiusVec(radius, radius, radius);
+  boundingBox = AABB(center - radiusVec, center + radiusVec);
 }
 
 bool Sphere::intersects(Ray &r, Intersection &intersection, CullingType culling)
 {
+  // Early rejection avec la bounding box
+  if (!boundingBox.intersects(r))
+  {
+    return false;
+  }
+
   // Vector from ray origin to center of sphere
   Vector3 OC = center - r.GetPosition();
 

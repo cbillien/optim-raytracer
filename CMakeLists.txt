@@ -8,7 +8,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 # Activer/désactiver le multithreading facilement
-#add_definitions(-DUSE_THREADING)
+add_definitions(-DUSE_THREADING)
 
 option(USE_THREADING "Enable multithreading" ON)
 
