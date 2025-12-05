@@ -16,18 +16,22 @@ void Sphere::applyTransform()
   Vector3 c;
   this->center = this->transform.apply(c);
 
+#ifdef USE_AABB
   // Calculer la bounding box de la sphère
   Vector3 radiusVec(radius, radius, radius);
   boundingBox = AABB(center - radiusVec, center + radiusVec);
+#endif
 }
 
 bool Sphere::intersects(Ray &r, Intersection &intersection, CullingType culling)
 {
+#ifdef USE_AABB
   // Early rejection avec la bounding box
   if (!boundingBox.intersects(r))
   {
     return false;
   }
+#endif
 
   // Vector from ray origin to center of sphere
   Vector3 OC = center - r.GetPosition();

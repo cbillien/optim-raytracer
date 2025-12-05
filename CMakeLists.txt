@@ -8,13 +8,30 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 # Activer/désactiver le multithreading facilement
-add_definitions(-DUSE_THREADING)
-
 option(USE_THREADING "Enable multithreading" ON)
 
 if(USE_THREADING)
     add_compile_definitions(USE_THREADING)
 endif()
+
+# ============================================================
+# ====================== AABB Optimization ===================
+# ============================================================
+option(USE_AABB "Enable AABB bounding box optimization" ON)
+
+if(USE_AABB)
+    add_compile_definitions(USE_AABB)
+endif()
+
+# ============================================================
+# ==================== Afficher la configuration =============
+# ============================================================
+message(STATUS "==========================================")
+message(STATUS "       RAYTRACER CONFIGURATION")
+message(STATUS "==========================================")
+message(STATUS "  USE_THREADING : ${USE_THREADING}")
+message(STATUS "  USE_AABB      : ${USE_AABB}")
+message(STATUS "==========================================")
 
 
 

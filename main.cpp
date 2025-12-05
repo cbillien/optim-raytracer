@@ -8,6 +8,22 @@ int main(int argc, char *argv[])
   std::cout << "*********************************" << std::endl;
   std::cout << "*** Kevin's Awesome Raytracer ***" << std::endl;
   std::cout << "*********************************" << std::endl;
+  
+  // Afficher la configuration de compilation
+  std::cout << "[Config] Threading: ";
+#ifdef USE_THREADING
+  std::cout << "ON" << std::endl;
+#else
+  std::cout << "OFF" << std::endl;
+#endif
+
+  std::cout << "[Config] AABB: ";
+#ifdef USE_AABB
+  std::cout << "ON" << std::endl;
+#else
+  std::cout << "OFF" << std::endl;
+#endif
+
   std::cout << std::endl;
 
   if (argc < 2)

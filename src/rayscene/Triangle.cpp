@@ -17,7 +17,8 @@ void Triangle::applyTransform()
   tA = this->transform.apply(A);
   tB = this->transform.apply(B);
   tC = this->transform.apply(C);
-  
+
+#ifdef USE_AABB
   // Calculer la bounding box du triangle (min/max de chaque coordonnée)
   Vector3 minPoint(
     std::min({tA.x, tB.x, tC.x}),
@@ -30,6 +31,7 @@ void Triangle::applyTransform()
     std::max({tA.z, tB.z, tC.z})
   );
   boundingBox = AABB(minPoint, maxPoint);
+#endif
 }
 
 bool Triangle::intersects(Ray &r, Intersection &intersection, CullingType culling)
