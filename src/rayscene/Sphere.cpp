@@ -36,22 +36,29 @@ bool Sphere::intersects(Ray &r, Intersection &intersection, CullingType culling)
   Vector3 P = r.GetPosition() + OP;
 
   // Is the length of CP greater than the radius of the circle ? If yes, no intersection!
+  // Optimisation: utiliser lengthSquared() au lieu de length() pour éviter sqrt
   Vector3 CP = P - center;
-  double distance = CP.length();
-  if (distance > radius)
+  double distanceSquared = CP.lengthSquared();
+  double radiusSquared = radius * radius;
+  if (distanceSquared > radiusSquared)
   {
     return false;
   }
 
   // Calculate the exact point of collision: P1
-  double a = sqrt(radius * radius - distance * distance);
-  double t = OP.length() - a;
+  // Optimisation: utiliser distanceSquared au lieu de distance pour éviter sqrt
+  double a = sqrt(radiusSquared - distanceSquared);
+  // Optimisation: calculer OP.lengthSquared() et prendre sqrt seulement une fois
+  double OP_length = sqrt(OP.lengthSquared());
+  double t = OP_length - a;
   Vector3 P1 = r.GetPosition() + (r.GetDirection() * t);
 
   // Pre-calculate some useful values for rendering
   intersection.Position = P1;
   intersection.Mat = this->material;
-  intersection.Normal = (P1 - center).normalize();
+  // Optimisation: calculer le vecteur une fois, puis normaliser
+  Vector3 toCenter = P1 - center;
+  intersection.Normal = toCenter.normalize();
 
   return true;
 }

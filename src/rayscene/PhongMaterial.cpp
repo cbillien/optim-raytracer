@@ -29,7 +29,15 @@ Color PhongMaterial::render(Ray &r, Ray &camera, Intersection *intersection, Sce
   {
     Light *light = lights[i];
 
-    Vector3 lightDir = (light->GetPosition() - intersection->Position).normalize();
+    // Optimisation: calculer le vecteur non normalisé d'abord, puis normaliser une seule fois
+    Vector3 lightDirUnnormalized = light->GetPosition() - intersection->Position;
+    double lightDirLengthSquared = lightDirUnnormalized.lengthSquared();
+    
+    // Éviter la division par zéro et normaliser seulement si nécessaire
+    if (lightDirLengthSquared < 0.000001) continue;
+    
+    double lightDirLength = sqrt(lightDirLengthSquared);
+    Vector3 lightDir = lightDirUnnormalized / lightDirLength; // division plus rapide que normalize()
 
     Vector3 origin = intersection->Position + lightDir;
     Ray lightRay(origin, lightDir);
